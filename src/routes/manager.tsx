@@ -72,16 +72,16 @@ function ManagerPortalComponent() {
 
   // View modals
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
-  const [viewingInvoiceItem, setViewingInvoiceItem] = useState<{order: Order, taxInvoice: TaxInvoice} | null>(null);
+  const [viewingInvoiceItem, setViewingInvoiceItem] = useState<{ order: Order, taxInvoice: TaxInvoice } | null>(null);
 
   // Edit PO
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
 
   // Edit Tax Invoice (edit-manager mode)
-  const [editingInvoiceBatch, setEditingInvoiceBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [editingInvoiceBatch, setEditingInvoiceBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
 
   // Generate Tax Invoice (for manager)
-  const [generatingBatch, setGeneratingBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [generatingBatch, setGeneratingBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
 
   // Decline dialog
   const [decliningOrder, setDecliningOrder] = useState<Order | null>(null);
@@ -91,26 +91,26 @@ function ManagerPortalComponent() {
   const [deletingOrder, setDeletingOrder] = useState<Order | null>(null);
 
   // Accept Work Order (Production Queue)
-  const [acceptingBatch, setAcceptingBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [acceptingBatch, setAcceptingBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
   const [duration, setDuration] = useState('30');
   const [requiredMaterials, setRequiredMaterials] = useState<{ materialId: string; quantity: number }[]>([]);
 
   // Reject order (Production Queue)
-  const [rejectingBatch, setRejectingBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [rejectingBatch, setRejectingBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
 
   // Confirm Loaded
-  const [loadingBatch, setLoadingBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [loadingBatch, setLoadingBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
   const [dispatchNote, setDispatchNote] = useState('');
 
   // Confirm Delivery
-  const [deliveringBatch, setDeliveringBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [deliveringBatch, setDeliveringBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
   const [deliveryNote, setDeliveryNote] = useState('');
   const [refBillChecked, setRefBillChecked] = useState(true);
   const [refBillNote, setRefBillNote] = useState('');
 
   // Update Bill Status
-  const [updatingBillBatch, setUpdatingBillBatch] = useState<{order: Order, line: OrderLine, batch: DeliveryBatch} | null>(null);
+  const [updatingBillBatch, setUpdatingBillBatch] = useState<{ order: Order, line: OrderLine, batch: DeliveryBatch } | null>(null);
 
   // Inventory
   const [editingMaterial, setEditingMaterial] = useState<{ id: string; name: string; unit: string; qty: number } | null>(null);
@@ -262,7 +262,7 @@ function ManagerPortalComponent() {
       await generateTaxInvoice(generatingBatch.order.id, generatingBatch.line.lineNo, generatingBatch.batch.batchId, invoice);
       toast.success(`Tax Invoice generated — batch ready for dispatch.`);
       setGeneratingBatch(null);
-    } catch {}
+    } catch { }
   };
 
   const handleSaveEditInvoice = async (invoice: TaxInvoice) => {
@@ -271,7 +271,7 @@ function ManagerPortalComponent() {
       await updateOrderTaxInvoice(editingInvoiceBatch.order.id, editingInvoiceBatch.batch.taxInvoice?.invoiceId || '', invoice);
       toast.success('Tax Invoice updated successfully.');
       setEditingInvoiceBatch(null);
-    } catch {}
+    } catch { }
   };
 
   // Create PO helpers
@@ -394,24 +394,24 @@ function ManagerPortalComponent() {
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase">PO Date</TableHead>
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
               </TableRow></TableHeader><TableBody>
-                {pending.map(o => (
-                  <TableRow key={o.id} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                    <TableCell className="font-mono font-semibold text-xs">{o.poNumber}</TableCell>
-                    <TableCell className="text-xs">{o.supplierName}</TableCell>
-                    <TableCell className="text-xs">{o.buyerName}</TableCell>
-                    <TableCell className="text-xs">{o.lines.length}</TableCell>
-                    <TableCell className="text-xs font-mono">{o.poDate}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-1.5">
-                        {viewPOBtn(o)}{editPOBtn(o)}
-                        <Button variant="primary" size="sm" onClick={() => { approveOrder(o.id); toast.success(`${o.poNumber} approved.`); }} className="h-7 rounded-lg px-2.5 text-[10px] font-semibold">Approve</Button>
-                        <Button variant="outline" size="sm" onClick={() => { setDecliningOrder(o); setDeclineReason(''); }} className="h-7 rounded-lg px-2.5 text-[10px] border-[#DC2626] text-[#DC2626] font-semibold">Decline</Button>
-                        {deleteBtn(o)}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody></Table></div></Card>
+                  {pending.map(o => (
+                    <TableRow key={o.id} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                      <TableCell className="font-mono font-semibold text-xs">{o.poNumber}</TableCell>
+                      <TableCell className="text-xs">{o.supplierName}</TableCell>
+                      <TableCell className="text-xs">{o.buyerName}</TableCell>
+                      <TableCell className="text-xs">{o.lines.length}</TableCell>
+                      <TableCell className="text-xs font-mono">{o.poDate}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {viewPOBtn(o)}{editPOBtn(o)}
+                          <Button variant="primary" size="sm" onClick={() => { approveOrder(o.id); toast.success(`${o.poNumber} approved.`); }} className="h-7 rounded-lg px-2.5 text-[10px] font-semibold">Approve</Button>
+                          <Button variant="outline" size="sm" onClick={() => { setDecliningOrder(o); setDeclineReason(''); }} className="h-7 rounded-lg px-2.5 text-[10px] border-[#DC2626] text-[#DC2626] font-semibold">Decline</Button>
+                          {deleteBtn(o)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody></Table></div></Card>
             )}
           </div>
         );
@@ -421,8 +421,8 @@ function ManagerPortalComponent() {
       // TAB 2: PRODUCTION QUEUE
       // ────────────────────────────────────────────────
       case 'production-queue': {
-        const pendingBatches = orders.flatMap(o => 
-          o.lines.flatMap(l => 
+        const pendingBatches = orders.flatMap(o =>
+          o.lines.flatMap(l =>
             (l.deliveryBatches || [])
               .filter(b => b.status === 'pending')
               .map(b => ({ batch: b, line: l, order: o }))
@@ -442,22 +442,22 @@ function ManagerPortalComponent() {
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase">Scheduled Date</TableHead>
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
               </TableRow></TableHeader><TableBody>
-                {pendingBatches.map(ctx => (
-                  <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                    <TableCell className="font-mono font-semibold text-xs">{ctx.order.poNumber} <Badge variant="outline" className="ml-1 text-[9px] bg-white text-[#1E3A5F]">Batch {ctx.batch.batchNumber}</Badge></TableCell>
-                    <TableCell className="text-xs">{ctx.order.buyerName}</TableCell>
-                    <TableCell className="text-xs font-mono">{ctx.batch.quantity} {ctx.line.uom}</TableCell>
-                    <TableCell className="text-xs font-mono">{ctx.batch.scheduledDate}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-1.5">
-                        {viewPOBtn(ctx.order)}
-                        <Button variant="primary" size="sm" onClick={() => { setAcceptingBatch(ctx); setDuration('30'); setRequiredMaterials([]); }} className="h-7 rounded-lg px-2.5 text-[10px] font-semibold bg-[#059669] border-transparent">Accept</Button>
-                        <Button variant="outline" size="sm" onClick={() => { setRejectingBatch(ctx); setRejectReason(''); }} className="h-7 rounded-lg px-2.5 text-[10px] border-[#DC2626] text-[#DC2626] font-semibold">Reject</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody></Table></div></Card>
+                  {pendingBatches.map(ctx => (
+                    <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                      <TableCell className="font-mono font-semibold text-xs">{ctx.order.poNumber} <Badge variant="outline" className="ml-1 text-[9px] bg-white text-[#1E3A5F]">Batch {ctx.batch.batchNumber}</Badge></TableCell>
+                      <TableCell className="text-xs">{ctx.order.buyerName}</TableCell>
+                      <TableCell className="text-xs font-mono">{ctx.batch.quantity} {ctx.line.uom}</TableCell>
+                      <TableCell className="text-xs font-mono">{ctx.batch.scheduledDate}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {viewPOBtn(ctx.order)}
+                          <Button variant="primary" size="sm" onClick={() => { setAcceptingBatch(ctx); setDuration('30'); setRequiredMaterials([]); }} className="h-7 rounded-lg px-2.5 text-[10px] font-semibold bg-[#059669] border-transparent">Accept</Button>
+                          <Button variant="outline" size="sm" onClick={() => { setRejectingBatch(ctx); setRejectReason(''); }} className="h-7 rounded-lg px-2.5 text-[10px] border-[#DC2626] text-[#DC2626] font-semibold">Reject</Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody></Table></div></Card>
             )}
           </div>
         );
@@ -467,8 +467,8 @@ function ManagerPortalComponent() {
       // TAB 3: ACTIVE PRODUCTION
       // ────────────────────────────────────────────────
       case 'active-production': {
-        const activeBatches = orders.flatMap(o => 
-          o.lines.flatMap(l => 
+        const activeBatches = orders.flatMap(o =>
+          o.lines.flatMap(l =>
             (l.deliveryBatches || [])
               .filter(b => b.status === 'in_progress' || b.status === 'on_hold')
               .map(b => ({ batch: b, line: l, order: o }))
@@ -487,33 +487,33 @@ function ManagerPortalComponent() {
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase">ETA</TableHead>
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
               </TableRow></TableHeader><TableBody>
-                {activeBatches.map(ctx => (
-                  <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                    <TableCell className="font-mono font-semibold text-xs">{ctx.order.poNumber} <Badge variant="outline" className="ml-1 text-[9px] bg-white text-[#1E3A5F]">Batch {ctx.batch.batchNumber}</Badge></TableCell>
-                    <TableCell className="text-xs">{ctx.order.buyerName}</TableCell>
-                    <TableCell><Badge variant={ctx.batch.status as any}>{formatStatus(ctx.batch.status)}</Badge></TableCell>
-                    <TableCell className="font-mono text-xs"><Countdown eta={ctx.batch.eta} status={ctx.batch.status} /></TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-1.5">
-                        {viewPOBtn(ctx.order)}{editPOBtn(ctx.order)}
-                        {ctx.batch.status === 'in_progress' ? (
-                          <Button variant="outline" size="sm" onClick={() => { holdOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} put on hold.`); }} className="h-7 rounded-lg px-2 text-[10px] border-[#EA580C] text-[#EA580C] font-semibold">
-                            <PauseCircle className="h-3 w-3 mr-1" />Hold
+                  {activeBatches.map(ctx => (
+                    <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                      <TableCell className="font-mono font-semibold text-xs">{ctx.order.poNumber} <Badge variant="outline" className="ml-1 text-[9px] bg-white text-[#1E3A5F]">Batch {ctx.batch.batchNumber}</Badge></TableCell>
+                      <TableCell className="text-xs">{ctx.order.buyerName}</TableCell>
+                      <TableCell><Badge variant={ctx.batch.status as any}>{formatStatus(ctx.batch.status)}</Badge></TableCell>
+                      <TableCell className="font-mono text-xs"><Countdown eta={ctx.batch.eta} status={ctx.batch.status} /></TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {viewPOBtn(ctx.order)}{editPOBtn(ctx.order)}
+                          {ctx.batch.status === 'in_progress' ? (
+                            <Button variant="outline" size="sm" onClick={() => { holdOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} put on hold.`); }} className="h-7 rounded-lg px-2 text-[10px] border-[#EA580C] text-[#EA580C] font-semibold">
+                              <PauseCircle className="h-3 w-3 mr-1" />Hold
+                            </Button>
+                          ) : (
+                            <Button variant="outline" size="sm" onClick={() => { resumeOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} resumed.`); }} className="h-7 rounded-lg px-2 text-[10px] border-[#059669] text-[#059669] font-semibold">
+                              <PlayCircle className="h-3 w-3 mr-1" />Resume
+                            </Button>
+                          )}
+                          <Button variant="primary" size="sm" onClick={() => { completeOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} marked complete.`); }} className="h-7 rounded-lg px-2 text-[10px] font-semibold bg-[#059669] border-transparent">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />Complete
                           </Button>
-                        ) : (
-                          <Button variant="outline" size="sm" onClick={() => { resumeOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} resumed.`); }} className="h-7 rounded-lg px-2 text-[10px] border-[#059669] text-[#059669] font-semibold">
-                            <PlayCircle className="h-3 w-3 mr-1" />Resume
-                          </Button>
-                        )}
-                        <Button variant="primary" size="sm" onClick={() => { completeOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} marked complete.`); }} className="h-7 rounded-lg px-2 text-[10px] font-semibold bg-[#059669] border-transparent">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />Complete
-                        </Button>
-                        {deleteBtn(ctx.order)}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody></Table></div></Card>
+                          {deleteBtn(ctx.order)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody></Table></div></Card>
             )}
           </div>
         );
@@ -554,22 +554,22 @@ function ManagerPortalComponent() {
                   <TableHead className="text-xs font-semibold text-heading-custom uppercase">Buyer</TableHead>
                   <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
                 </TableRow></TableHeader><TableBody>
-                  {invoicePendingBatches.map(ctx => (
-                    <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                      <TableCell className="font-mono font-semibold text-xs">{ctx.order.poNumber} <Badge variant="outline" className="ml-1 text-[9px] bg-white text-[#1E3A5F]">Batch {ctx.batch.batchNumber}</Badge></TableCell>
-                      <TableCell className="text-xs">{ctx.order.supplierName}</TableCell>
-                      <TableCell className="text-xs">{ctx.order.buyerName}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end space-x-1.5">
-                          {viewPOBtn(ctx.order)}
-                          <Button variant="primary" size="sm" onClick={() => setGeneratingBatch(ctx)} className="h-7 rounded-lg px-2.5 text-[10px] font-semibold bg-[#6D28D9] border-transparent">
-                            <FileText className="h-3 w-3 mr-1" />Generate Invoice
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody></Table></div></Card>
+                    {invoicePendingBatches.map(ctx => (
+                      <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                        <TableCell className="font-mono font-semibold text-xs">{ctx.order.poNumber} <Badge variant="outline" className="ml-1 text-[9px] bg-white text-[#1E3A5F]">Batch {ctx.batch.batchNumber}</Badge></TableCell>
+                        <TableCell className="text-xs">{ctx.order.supplierName}</TableCell>
+                        <TableCell className="text-xs">{ctx.order.buyerName}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end space-x-1.5">
+                            {viewPOBtn(ctx.order)}
+                            <Button variant="primary" size="sm" onClick={() => setGeneratingBatch(ctx)} className="h-7 rounded-lg px-2.5 text-[10px] font-semibold bg-[#6D28D9] border-transparent">
+                              <FileText className="h-3 w-3 mr-1" />Generate Invoice
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody></Table></div></Card>
               )}
             </div>
 
@@ -586,20 +586,20 @@ function ManagerPortalComponent() {
                   <TableHead className="text-xs font-semibold text-heading-custom uppercase">Status</TableHead>
                   <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
                 </TableRow></TableHeader><TableBody>
-                  {hasInvoiceBatches.map(ctx => (
-                    <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                      <TableCell className="font-mono font-semibold text-xs">{ctx.batch.taxInvoice?.invoiceNumber}</TableCell>
-                      <TableCell className="font-mono text-xs">{ctx.order.poNumber} <span className="text-[10px] text-text-muted">Batch {ctx.batch.batchNumber}</span></TableCell>
-                      <TableCell className="text-xs">{ctx.batch.taxInvoice?.consigneeName}</TableCell>
-                      <TableCell><Badge variant={ctx.batch.status as any}>{formatStatus(ctx.batch.status)}</Badge></TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end space-x-1.5">
-                          {viewInvoiceBtn(ctx.order, ctx.batch.taxInvoice)}{editInvoiceBtn(ctx)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody></Table></div></Card>
+                    {hasInvoiceBatches.map(ctx => (
+                      <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                        <TableCell className="font-mono font-semibold text-xs">{ctx.batch.taxInvoice?.invoiceNumber}</TableCell>
+                        <TableCell className="font-mono text-xs">{ctx.order.poNumber} <span className="text-[10px] text-text-muted">Batch {ctx.batch.batchNumber}</span></TableCell>
+                        <TableCell className="text-xs">{ctx.batch.taxInvoice?.consigneeName}</TableCell>
+                        <TableCell><Badge variant={ctx.batch.status as any}>{formatStatus(ctx.batch.status)}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end space-x-1.5">
+                            {viewInvoiceBtn(ctx.order, ctx.batch.taxInvoice)}{editInvoiceBtn(ctx)}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody></Table></div></Card>
               )}
             </div>
           </div>
@@ -634,43 +634,43 @@ function ManagerPortalComponent() {
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase">Ref Bill</TableHead>
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
               </TableRow></TableHeader><TableBody>
-                {dispatchedBatches.map(ctx => (
-                  <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                    <TableCell className="font-mono font-semibold text-xs">{ctx.batch.taxInvoice?.invoiceNumber || '—'}</TableCell>
-                    <TableCell className="text-xs font-mono">{ctx.order.poNumber} <span className="text-[10px] text-text-muted">Batch {ctx.batch.batchNumber}</span></TableCell>
-                    <TableCell className="text-xs">{ctx.batch.taxInvoice?.consigneeName || ctx.order.customerName || '—'}</TableCell>
-                    <TableCell><Badge variant={ctx.batch.status as any}>{formatStatus(ctx.batch.status)}</Badge></TableCell>
-                    <TableCell>
-                      {ctx.batch.status === 'delivered' ? (
-                        ctx.batch.refBillReceived
-                          ? <span className="text-[#059669] text-xs font-medium flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" />Received</span>
-                          : <div><span className="text-[#DC2626] text-xs font-medium flex items-center gap-1"><FileWarning className="h-3.5 w-3.5" />Pending</span>
-                            {ctx.batch.refBillNote && <p className="text-[10px] text-text-muted mt-0.5">{ctx.batch.refBillNote}</p>}</div>
-                      ) : '—'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-1.5 flex-wrap gap-y-1">
-                        {viewPOBtn(ctx.order)}{viewInvoiceBtn(ctx.order, ctx.batch.taxInvoice)}{editInvoiceBtn(ctx)}
-                        {(ctx.batch.status === 'invoiced' || ctx.batch.status === 'ready_for_dispatch') && (
-                          <Button variant="primary" size="sm" onClick={() => { setLoadingBatch(ctx); setDispatchNote(''); }} className="h-7 rounded-lg px-2 text-[10px] font-semibold">
-                            <PackageCheck className="h-3 w-3 mr-1" />Loaded
-                          </Button>
-                        )}
-                        {ctx.batch.status === 'loaded' && (
-                          <Button variant="primary" size="sm" onClick={() => { setDeliveringBatch(ctx); setDeliveryNote(''); setRefBillChecked(true); setRefBillNote(''); }} className="h-7 rounded-lg px-2 text-[10px] font-semibold bg-[#0D9488] border-transparent">
-                            <Navigation className="h-3 w-3 mr-1" />Delivered
-                          </Button>
-                        )}
-                        {ctx.batch.status === 'delivered' && !ctx.batch.refBillReceived && (
-                          <Button variant="outline" size="sm" onClick={() => setUpdatingBillBatch(ctx)} className="h-7 rounded-lg px-2 text-[10px] border-[#D97706] text-[#D97706]">
-                            Update Bill
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody></Table></div></Card>
+                  {dispatchedBatches.map(ctx => (
+                    <TableRow key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                      <TableCell className="font-mono font-semibold text-xs">{ctx.batch.taxInvoice?.invoiceNumber || '—'}</TableCell>
+                      <TableCell className="text-xs font-mono">{ctx.order.poNumber} <span className="text-[10px] text-text-muted">Batch {ctx.batch.batchNumber}</span></TableCell>
+                      <TableCell className="text-xs">{ctx.batch.taxInvoice?.consigneeName || ctx.order.customerName || '—'}</TableCell>
+                      <TableCell><Badge variant={ctx.batch.status as any}>{formatStatus(ctx.batch.status)}</Badge></TableCell>
+                      <TableCell>
+                        {ctx.batch.status === 'delivered' ? (
+                          ctx.batch.refBillReceived
+                            ? <span className="text-[#059669] text-xs font-medium flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" />Received</span>
+                            : <div><span className="text-[#DC2626] text-xs font-medium flex items-center gap-1"><FileWarning className="h-3.5 w-3.5" />Pending</span>
+                              {ctx.batch.refBillNote && <p className="text-[10px] text-text-muted mt-0.5">{ctx.batch.refBillNote}</p>}</div>
+                        ) : '—'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-1.5 flex-wrap gap-y-1">
+                          {viewPOBtn(ctx.order)}{viewInvoiceBtn(ctx.order, ctx.batch.taxInvoice)}{editInvoiceBtn(ctx)}
+                          {ctx.batch.status === 'invoiced' && (
+                            <Button variant="primary" size="sm" onClick={() => { setLoadingBatch(ctx); setDispatchNote(''); }} className="h-7 rounded-lg px-2 text-[10px] font-semibold">
+                              <PackageCheck className="h-3 w-3 mr-1" />Loaded
+                            </Button>
+                          )}
+                          {ctx.batch.status === 'loaded' && (
+                            <Button variant="primary" size="sm" onClick={() => { setDeliveringBatch(ctx); setDeliveryNote(''); setRefBillChecked(true); setRefBillNote(''); }} className="h-7 rounded-lg px-2 text-[10px] font-semibold bg-[#0D9488] border-transparent">
+                              <Navigation className="h-3 w-3 mr-1" />Delivered
+                            </Button>
+                          )}
+                          {ctx.batch.status === 'delivered' && !ctx.batch.refBillReceived && (
+                            <Button variant="outline" size="sm" onClick={() => setUpdatingBillBatch(ctx)} className="h-7 rounded-lg px-2 text-[10px] border-[#D97706] text-[#D97706]">
+                              Update Bill
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody></Table></div></Card>
             )}
           </div>
         );
@@ -695,22 +695,22 @@ function ManagerPortalComponent() {
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase">Invoices</TableHead>
                 <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
               </TableRow></TableHeader><TableBody>
-                {orders.map(o => (
-                  <TableRow key={o.id} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                    <TableCell className="font-mono font-semibold text-xs">{o.poNumber}</TableCell>
-                    <TableCell className="text-xs">{o.supplierName}</TableCell>
-                    <TableCell className="text-xs">{o.buyerName}</TableCell>
-                    <TableCell><Badge variant={o.status as any}>{formatStatus(o.status)}</Badge></TableCell>
-                    <TableCell className="text-xs font-mono">{o.poDate}</TableCell>
-                    <TableCell className="text-xs font-mono">{o.taxInvoices?.length || 0} Invoices</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-1.5">
-                        {viewPOBtn(o)}{editPOBtn(o)}{deleteBtn(o)}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody></Table></div></Card>
+                  {orders.map(o => (
+                    <TableRow key={o.id} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                      <TableCell className="font-mono font-semibold text-xs">{o.poNumber}</TableCell>
+                      <TableCell className="text-xs">{o.supplierName}</TableCell>
+                      <TableCell className="text-xs">{o.buyerName}</TableCell>
+                      <TableCell><Badge variant={o.status as any}>{formatStatus(o.status)}</Badge></TableCell>
+                      <TableCell className="text-xs font-mono">{o.poDate}</TableCell>
+                      <TableCell className="text-xs font-mono">{o.taxInvoices?.length || 0} Invoices</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {viewPOBtn(o)}{editPOBtn(o)}{deleteBtn(o)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody></Table></div></Card>
             )}
           </div>
         );
@@ -831,7 +831,7 @@ function ManagerPortalComponent() {
                                 <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-border-custom"><Paperclip className="h-3.5 w-3.5 text-text-muted" /></Button></div>
                             ) : (
                               <div className="flex items-center space-x-1 border border-border-custom rounded px-1">
-                                {row.drawingRefFile.type.startsWith('image/') ? <img src={row.drawingRefFile.dataUrl} className="h-4 w-4 object-cover rounded-sm" alt="" /> : <FileText className="h-4 w-4 text-text-muted" />}
+                                {row.drawingRefFile.type?.startsWith('image/') ? <img src={row.drawingRefFile.dataUrl} className="h-4 w-4 object-cover rounded-sm" alt="" /> : <FileText className="h-4 w-4 text-text-muted" />}
                                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-red-50 text-red-500 rounded" onClick={() => updateLine(idx, 'drawingRefFile', undefined)}><X className="h-3 w-3" /></Button>
                               </div>
                             )}
@@ -842,16 +842,16 @@ function ManagerPortalComponent() {
                         <div className="space-y-1"><Label className="text-[10px]">Req. Date *</Label><Input type="date" value={row.requestedDate} onChange={e => updateLine(idx, 'requestedDate', e.target.value)} className="bg-white rounded border-border-custom h-8 text-xs" /></div>
                         <div className="space-y-1"><Label className="text-[10px]">Unit Price *</Label><Input type="number" min="0" step="0.01" value={row.unitPrice} onChange={e => updateLine(idx, 'unitPrice', e.target.value)} className="bg-white rounded border-border-custom h-8 text-xs font-mono" /></div>
                       </div>
-                      
+
                       {/* Split Delivery Section */}
                       <div className="mt-2 border-t border-border-custom/50 pt-2">
                         <div className="flex items-center justify-between">
                           <Label className="text-[10px] font-semibold text-[#1E3A5F]">Delivery Schedule</Label>
-                          <Button 
+                          <Button
                             onClick={() => {
                               const newBatches = [...row.batches, { quantity: '', scheduledDate: row.requestedDate }];
                               updateLine(idx, 'batches', newBatches);
-                            }} 
+                            }}
                             variant="outline" size="sm" className="h-6 text-[10px] px-2 rounded">
                             <Plus className="h-3 w-3 mr-1" />Split Delivery
                           </Button>
@@ -860,10 +860,10 @@ function ManagerPortalComponent() {
                           <div className="mt-2 space-y-2 bg-[#F8FAFC] p-2 rounded border border-slate-200">
                             {row.batches.map((b, bIdx) => (
                               <div key={bIdx} className="flex items-center space-x-2">
-                                <span className="text-[10px] font-mono w-4">{bIdx+1}.</span>
+                                <span className="text-[10px] font-mono w-4">{bIdx + 1}.</span>
                                 <div className="flex-1 space-y-1">
                                   <Label className="text-[10px]">Qty</Label>
-                                  <Input type="number" min="1" value={b.quantity} 
+                                  <Input type="number" min="1" value={b.quantity}
                                     onChange={e => {
                                       const newB = [...row.batches];
                                       newB[bIdx].quantity = e.target.value;
@@ -873,7 +873,7 @@ function ManagerPortalComponent() {
                                 </div>
                                 <div className="flex-1 space-y-1">
                                   <Label className="text-[10px]">Date</Label>
-                                  <Input type="date" value={b.scheduledDate} 
+                                  <Input type="date" value={b.scheduledDate}
                                     onChange={e => {
                                       const newB = [...row.batches];
                                       newB[bIdx].scheduledDate = e.target.value;
@@ -980,30 +980,30 @@ function ManagerPortalComponent() {
               <TableHead className="text-xs font-semibold text-heading-custom uppercase">Quantity</TableHead>
               <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
             </TableRow></TableHeader><TableBody>
-              {inventory.map(m => (
-                <TableRow key={m.id} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                  <TableCell className="font-mono text-xs">{m.id}</TableCell>
-                  <TableCell className="text-xs font-medium">{m.name}</TableCell>
-                  <TableCell className="text-xs">{m.unit}</TableCell>
-                  <TableCell className="text-xs">
-                    {editingQtyId === m.id ? (
-                      <Input type="number" value={editingQtyVal} onChange={e => setEditingQtyVal(e.target.value)}
-                        onBlur={() => { updateMaterialQty(m.id, parseFloat(editingQtyVal) || 0); setEditingQtyId(null); toast.success('Quantity updated.'); }}
-                        onKeyDown={e => { if (e.key === 'Enter') { updateMaterialQty(m.id, parseFloat(editingQtyVal) || 0); setEditingQtyId(null); toast.success('Quantity updated.'); } }}
-                        className="h-7 w-20 text-xs font-mono" autoFocus />
-                    ) : (
-                      <span className="font-mono cursor-pointer hover:text-primary-custom" onClick={() => { setEditingQtyId(m.id); setEditingQtyVal(String(m.quantity)); }}>{m.quantity}</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end space-x-1.5">
-                      <Button variant="outline" size="sm" onClick={() => setEditingMaterial({ id: m.id, name: m.name, unit: m.unit, qty: m.quantity })} className="h-7 w-7 p-0 rounded-lg border-[#D97706] text-[#D97706]"><Edit2 className="h-3.5 w-3.5" /></Button>
-                      <Button variant="outline" size="sm" onClick={() => setDeletingMat(m.id)} className="h-7 w-7 p-0 rounded-lg border-[#DC2626] text-[#DC2626]"><Trash className="h-3.5 w-3.5" /></Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody></Table></div></Card>
+                {inventory.map(m => (
+                  <TableRow key={m.id} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                    <TableCell className="font-mono text-xs">{m.id}</TableCell>
+                    <TableCell className="text-xs font-medium">{m.name}</TableCell>
+                    <TableCell className="text-xs">{m.unit}</TableCell>
+                    <TableCell className="text-xs">
+                      {editingQtyId === m.id ? (
+                        <Input type="number" value={editingQtyVal} onChange={e => setEditingQtyVal(e.target.value)}
+                          onBlur={() => { updateMaterialQty(m.id, parseFloat(editingQtyVal) || 0); setEditingQtyId(null); toast.success('Quantity updated.'); }}
+                          onKeyDown={e => { if (e.key === 'Enter') { updateMaterialQty(m.id, parseFloat(editingQtyVal) || 0); setEditingQtyId(null); toast.success('Quantity updated.'); } }}
+                          className="h-7 w-20 text-xs font-mono" autoFocus />
+                      ) : (
+                        <span className="font-mono cursor-pointer hover:text-primary-custom" onClick={() => { setEditingQtyId(m.id); setEditingQtyVal(String(m.quantity)); }}>{m.quantity}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end space-x-1.5">
+                        <Button variant="outline" size="sm" onClick={() => setEditingMaterial({ id: m.id, name: m.name, unit: m.unit, qty: m.quantity })} className="h-7 w-7 p-0 rounded-lg border-[#D97706] text-[#D97706]"><Edit2 className="h-3.5 w-3.5" /></Button>
+                        <Button variant="outline" size="sm" onClick={() => setDeletingMat(m.id)} className="h-7 w-7 p-0 rounded-lg border-[#DC2626] text-[#DC2626]"><Trash className="h-3.5 w-3.5" /></Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody></Table></div></Card>
           </div>
         );
       }
@@ -1026,24 +1026,24 @@ function ManagerPortalComponent() {
               <TableHead className="text-xs font-semibold text-heading-custom uppercase">Portal URL</TableHead>
               <TableHead className="text-xs font-semibold text-heading-custom uppercase text-right">Actions</TableHead>
             </TableRow></TableHeader><TableBody>
-              {users.map(u => (
-                <TableRow key={u.username} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
-                  <TableCell className="font-mono text-xs font-semibold">{u.username}</TableCell>
-                  <TableCell className="text-xs capitalize">{u.role}</TableCell>
-                  <TableCell className="text-xs font-mono text-text-muted">/{u.role === 'manager' ? 'manager' : u.role}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end space-x-1.5">
-                      <Button variant="outline" size="sm" onClick={() => { setEditingUser(u); setEditUserName(u.username); setEditUserPass(u.password); }} className="h-7 w-7 p-0 rounded-lg border-[#D97706] text-[#D97706]"><Edit2 className="h-3.5 w-3.5" /></Button>
-                      {u.username === 'manager' ? (
-                        <Button variant="outline" size="sm" disabled className="h-7 w-7 p-0 rounded-lg border-slate-200 text-slate-300 cursor-not-allowed" title="Cannot delete super admin"><Trash className="h-3.5 w-3.5" /></Button>
-                      ) : (
-                        <Button variant="outline" size="sm" onClick={() => setDeletingUser(u.username)} className="h-7 w-7 p-0 rounded-lg border-[#DC2626] text-[#DC2626]"><Trash className="h-3.5 w-3.5" /></Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody></Table></div></Card>
+                {users.map(u => (
+                  <TableRow key={u.username} className="border-b border-border-custom/30 hover:bg-table-row-hover bg-white">
+                    <TableCell className="font-mono text-xs font-semibold">{u.username}</TableCell>
+                    <TableCell className="text-xs capitalize">{u.role}</TableCell>
+                    <TableCell className="text-xs font-mono text-text-muted">/{u.role === 'manager' ? 'manager' : u.role}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end space-x-1.5">
+                        <Button variant="outline" size="sm" onClick={() => { setEditingUser(u); setEditUserName(u.username); setEditUserPass(u.password); }} className="h-7 w-7 p-0 rounded-lg border-[#D97706] text-[#D97706]"><Edit2 className="h-3.5 w-3.5" /></Button>
+                        {u.username === 'manager' ? (
+                          <Button variant="outline" size="sm" disabled className="h-7 w-7 p-0 rounded-lg border-slate-200 text-slate-300 cursor-not-allowed" title="Cannot delete super admin"><Trash className="h-3.5 w-3.5" /></Button>
+                        ) : (
+                          <Button variant="outline" size="sm" onClick={() => setDeletingUser(u.username)} className="h-7 w-7 p-0 rounded-lg border-[#DC2626] text-[#DC2626]"><Trash className="h-3.5 w-3.5" /></Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody></Table></div></Card>
           </div>
         );
       }
@@ -1088,9 +1088,9 @@ function ManagerPortalComponent() {
             const isActive = activeTab === tab.key;
             const badgeCount =
               tab.key === 'approvals' ? orders.filter(o => o.status === 'awaiting_approval').length :
-              tab.key === 'production-queue' ? orders.filter(o => o.status === 'pending').length :
-              tab.key === 'invoice-queue' ? orders.filter(o => o.status === 'tax_invoice_pending').length :
-              tab.key === 'inbox' ? managerMessages.length : 0;
+                tab.key === 'production-queue' ? orders.filter(o => o.status === 'pending').length :
+                  tab.key === 'invoice-queue' ? orders.filter(o => o.status === 'tax_invoice_pending').length :
+                    tab.key === 'inbox' ? managerMessages.length : 0;
             return (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center space-x-1.5 px-3 py-2.5 text-xs font-semibold whitespace-nowrap rounded-t-lg transition-colors border-b-2 ${isActive ? 'border-[#1D4ED8] text-[#1D4ED8] bg-[#EFF6FF]' : 'border-transparent text-text-muted hover:text-text-primary hover:bg-slate-50'}`}>

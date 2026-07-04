@@ -48,7 +48,7 @@ const emptyLine = (): LineRow => ({
 });
 
 function SalesPortalComponent() {
-  const { orders, messages, createOrder, nextPoNumber, isLoadingOrders } = useStore();
+  const { orders, messages, createOrder } = useStore();
 
   // PO Viewer
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
@@ -364,7 +364,7 @@ function SalesPortalComponent() {
                           <TableRow className="bg-slate-50/50">
                             <TableCell colSpan={6} className="p-0 border-t-0 pb-3">
                               <div className="pl-14 pr-4 space-y-1">
-                                {o.lines.flatMap((l: any) => (l.deliveryBatches || []).map((b: any, bIdx: number) => (
+                                {o.lines.flatMap((l: any) => (l.deliveryBatches || []).map((b: any, _bIdx: number) => (
                                   <div key={b.batchId} className="flex items-center text-[11px] text-text-muted font-mono border-l-2 border-slate-300 pl-3 py-0.5">
                                     <span className="w-20">Line {l.lineNo}</span>
                                     <span className="w-24">Batch {b.batchNumber}</span>
@@ -652,7 +652,7 @@ function SalesPortalComponent() {
                           </div>
                         ) : (
                           <div className="flex items-center space-x-1 border border-border-custom rounded px-1 max-w-[80px]">
-                            {row.drawingRefFile.type.startsWith('image/') ? (
+                            {row.drawingRefFile.type?.startsWith('image/') ? (
                               <img src={row.drawingRefFile.dataUrl} className="h-4 w-4 object-cover rounded-sm" />
                             ) : (
                               <FileText className="h-4 w-4 text-text-muted" />

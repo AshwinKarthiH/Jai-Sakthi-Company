@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useStore } from '../store/StoreContext';
 import type { Order, OrderLine, DeliveryBatch, DrawingRefFile } from '../store/StoreContext';
@@ -107,7 +107,7 @@ function ProductionPortalComponent() {
           onClick={() => openFileInPopup(file)}
           title={`Click to view: ${file.name}`}
         >
-          {file.type.startsWith('image/') ? (
+          {file.type?.startsWith('image/') ? (
             <img src={file.dataUrl} alt="ref" className="h-12 w-12 object-cover rounded-sm" />
           ) : (
             <span className="text-sm">📄</span>

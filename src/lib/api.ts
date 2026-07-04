@@ -67,11 +67,7 @@ api.interceptors.response.use(
 
     // Handle common HTTP errors
     const status = err.response?.status
-    const errorMsg =
-      err.response?.data?.error ||
-      err.response?.data?.detail ||
-      err.response?.data?.message ||
-      "An error occurred."
+
 
     if (status === 403) {
       if (window.location.pathname !== "/") {

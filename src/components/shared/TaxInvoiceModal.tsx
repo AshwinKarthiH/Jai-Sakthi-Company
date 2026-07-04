@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import type { Order } from '../../store/StoreContext';
+import type { Order, TaxInvoice } from '../../store/StoreContext';
 import { Dialog } from '../ui/Dialog';
 import { Button } from '../ui/Button';
 import { Printer } from 'lucide-react';
@@ -211,7 +211,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ item, isOpen, 
             </tr>
 
             {/* Line Items */}
-            {invoice.lines.map((line, idx) => (
+            {invoice.lines.map((line: any, idx: number) => (
               <tr key={idx}>
                 <td style={{ border: '1px solid #334155', borderBottom: 'none', padding: '6px', textAlign: 'center' }}>{line.slNo}</td>
                 <td style={{ border: '1px solid #334155', borderBottom: 'none', padding: '6px' }}>
@@ -224,7 +224,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ item, isOpen, 
                 <td style={{ border: '1px solid #334155', borderBottom: 'none', padding: '6px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(line.amount)}</td>
               </tr>
             ))}
-            
+
             {/* Taxes */}
             <tr>
               <td style={{ border: '1px solid #334155', borderTop: 'none', borderBottom: 'none', padding: '2px 6px' }}></td>
@@ -297,7 +297,7 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ item, isOpen, 
             </tr>
 
             {/* HSN Summary Rows */}
-            {invoice.hsnSummary.map((hsn, idx) => (
+            {invoice.hsnSummary.map((hsn: any, idx: number) => (
               <tr key={idx}>
                 <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'center' }}>{hsn.hsnSac}</td>
                 <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right' }}>{formatCurrency(hsn.taxableValue)}</td>
@@ -310,14 +310,13 @@ export const TaxInvoiceModal: React.FC<TaxInvoiceModalProps> = ({ item, isOpen, 
             ))}
             <tr style={{ background: '#F8FAFC' }}>
               <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>Total</td>
-              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a, b) => a + b.taxableValue, 0))}</td>
+              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a: number, b: any) => a + b.taxableValue, 0))}</td>
               <td style={{ border: '1px solid #334155', padding: '4px' }}></td>
-              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a, b) => a + b.cgstAmount, 0))}</td>
+              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a: number, b: any) => a + b.cgstAmount, 0))}</td>
               <td style={{ border: '1px solid #334155', padding: '4px' }}></td>
-              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a, b) => a + b.sgstAmount, 0))}</td>
-              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a, b) => a + b.totalTaxAmount, 0))}</td>
+              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a: number, b: any) => a + b.sgstAmount, 0))}</td>
+              <td style={{ border: '1px solid #334155', padding: '4px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(invoice.hsnSummary.reduce((a: number, b: any) => a + b.totalTaxAmount, 0))}</td>
             </tr>
-
             {/* Tax in words */}
             <tr>
               <td colSpan={7} style={{ border: '1px solid #334155', padding: '8px 16px' }}>

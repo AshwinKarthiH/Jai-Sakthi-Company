@@ -24,7 +24,7 @@ function LoginComponent() {
     }
   }, [user, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
       toast.error('Please enter both username and password.');
@@ -32,7 +32,7 @@ function LoginComponent() {
       return;
     }
 
-    const success = login(username.trim(), password);
+    const success = await login(username.trim(), password);
     if (success) {
       toast.success('Logged in successfully!');
     } else {

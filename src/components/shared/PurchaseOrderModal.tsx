@@ -63,24 +63,25 @@ export const PurchaseOrderModal: React.FC<PurchaseOrderModalProps> = ({ order, v
   };
 
   // File attachment rendering helper with popup + download
-  const renderFileAttachment = (file: { name: string; type: string; dataUrl: string }) => (
+  // File attachment rendering helper with popup + download
+  const renderFileAttachment = (file: import('../../store/StoreContext').DrawingRefFile) => (
     <div style={{ marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
       <div
         style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#F1F5F9', padding: '4px 6px', borderRadius: '4px', border: '1px solid #E2E8F0' }}
-        onClick={() => openFileInPopup(file)}
-        title={`Click to view: ${file.name}`}
+        onClick={() => openFileInPopup(file as any)}
+        title={`Click to view: ${file.name || 'Attachment'}`}
       >
-        {file.type.startsWith('image/') ? (
+        {file.type?.startsWith('image/') ? (
           <img src={file.dataUrl} alt="preview" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px' }} />
         ) : (
           <span style={{ fontSize: '14px' }}>📄</span>
         )}
         <span style={{ fontSize: '9px', color: '#334155', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {file.name}
+          {file.name || 'Attached File'}
         </span>
       </div>
       <button
-        onClick={(e) => { e.stopPropagation(); downloadFile(file); }}
+        onClick={(e) => { e.stopPropagation(); downloadFile(file as any); }}
         style={{ background: 'none', border: '1px solid #BFDBFE', borderRadius: '4px', padding: '2px 4px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
         title="Download"
       >
@@ -88,6 +89,7 @@ export const PurchaseOrderModal: React.FC<PurchaseOrderModalProps> = ({ order, v
       </button>
     </div>
   );
+
 
   // ========== PRODUCTION WORK CARD VIEW ==========
   if (viewMode === 'production-work-card') {

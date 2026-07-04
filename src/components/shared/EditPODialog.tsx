@@ -225,7 +225,7 @@ export const EditPODialog: React.FC<Props> = ({ order, isOpen, onClose }) => {
       <div className="flex items-center gap-1 mt-1">
         <div className="inline-flex items-center gap-1 cursor-pointer bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 hover:bg-slate-200 transition-colors text-[9px]"
           onClick={() => openFileInPopup(file)} title={file.name}>
-          {file.type.startsWith('image/') ? (
+          {file.type?.startsWith('image/') ? (
             <img src={file.dataUrl} className="h-5 w-5 object-cover rounded-sm" alt="ref" />
           ) : <FileText className="h-3.5 w-3.5 text-slate-500" />}
           <span className="max-w-[60px] truncate text-slate-600">{file.name}</span>

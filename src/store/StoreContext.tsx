@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
@@ -26,6 +26,7 @@ export type DeliveryBatch = {
   eta?: number;
   materials?: { materialId: string; quantity: number }[];
   taxInvoiceId?: string;
+  taxInvoice?: TaxInvoice; // <-- ADD THIS LINE
   loadedAt?: number;
   deliveredAt?: number;
   refBillReceived?: boolean;
@@ -42,9 +43,8 @@ export type OrderLine = {
   drawingRefFile?: DrawingRefFile;
   requestedDate: string;
   unitPrice: number;
-  deliveryBatches: DeliveryBatch[];
+  deliveryBatches?: DeliveryBatch[]; // <-- ADD THE '?' HERE
 };
-
 export type TaxInvoiceLine = {
   slNo: number;
   description: string;
@@ -205,7 +205,7 @@ export type StoredUser = {
 
 // === Store Interface ===
 
-export type CreateOrderData = Omit<Order, 'id' | 'poNumber' | 'status'>;
+export type CreateOrderData = Omit<Order, 'id' | 'poNumber' | 'status' | 'taxInvoices'>;
 
 interface StoreContextType {
   user: User | null;
@@ -220,11 +220,11 @@ interface StoreContextType {
   logout: () => void;
   createOrder: (orderData: CreateOrderData) => Promise<void>;
   updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
-  acceptOrder: (orderId: string, durationMinutes: number, reqMaterials: { materialId: string; quantity: number }[]) => Promise<void>;
-  rejectOrder: (orderId: string, reason: string) => Promise<void>;
-  completeOrder: (orderId: string) => Promise<void>;
-  holdOrder: (orderId: string) => Promise<void>;
-  resumeOrder: (orderId: string) => Promise<void>;
+  acceptOrder: (orderId: string, lineNo: number, batchId: string, durationMinutes: number, reqMaterials: { materialId: string; quantity: number }[]) => Promise<void>;
+  rejectOrder: (orderId: string, lineNo: number, batchId: string, reason: string) => Promise<void>;
+  completeOrder: (orderId: string, lineNo: number, batchId: string) => Promise<void>;
+  holdOrder: (orderId: string, lineNo: number, batchId: string) => Promise<void>;
+  resumeOrder: (orderId: string, lineNo: number, batchId: string) => Promise<void>;
   removeOrder: (orderId: string) => Promise<void>;
   approveOrder: (orderId: string) => Promise<void>;
   generateTaxInvoice: (orderId: string, lineNo: number, batchId: string, taxInvoice: Partial<TaxInvoice>) => Promise<void>;
@@ -310,7 +310,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const logout = useCallback(() => {
     const refresh = localStorage.getItem('refresh_token');
-    if (refresh) api.post('/auth/logout/', { refresh }).catch(() => {});
+    if (refresh) api.post('/auth/logout/', { refresh }).catch(() => { });
     localStorage.clear();
     setUser(null);
     qc.clear();
