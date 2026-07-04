@@ -1,7 +1,7 @@
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {}
+export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> { }
 
 export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, ...props }, ref) => {

@@ -74,7 +74,7 @@ function InventoryPortalComponent() {
   };
 
   return (
-    <PortalLayout expectedRole="inventory" title="JaiSakthi — Inventory Portal">
+    <PortalLayout expectedRole="inventory" title="JaiSakthi Packaging — Inventory Portal">
       <div className="space-y-6">
         {/* Title and Controls Card */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

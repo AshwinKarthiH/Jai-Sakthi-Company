@@ -1,7 +1,7 @@
 import * as React from "react"
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "destructive" | "outline" | "pending" | "awaiting_approval" | "in_progress" | "ready_for_dispatch" | "loaded" | "delivered" | "rejected" | "on_hold";
+  variant?: "default" | "secondary" | "destructive" | "outline" | "pending" | "awaiting_approval" | "in_progress" | "ready_for_dispatch" | "loaded" | "delivered" | "rejected" | "on_hold" | "tax_invoice_pending";
 }
 
 function Badge({ className = "", variant = "default", ...props }: BadgeProps) {
@@ -17,26 +17,31 @@ function Badge({ className = "", variant = "default", ...props }: BadgeProps) {
       variantClass = "text-foreground";
       break;
     case "pending":
+      variantClass = "bg-[#D97706] text-white border-transparent";
+      break;
     case "awaiting_approval":
-      variantClass = "bg-yellow-100 text-yellow-800 border-yellow-200";
+      variantClass = "bg-[#4F46E5] text-white border-transparent";
       break;
     case "in_progress":
-      variantClass = "bg-blue-100 text-blue-800 border-blue-200";
-      break;
-    case "ready_for_dispatch":
-      variantClass = "bg-purple-100 text-purple-800 border-purple-200";
-      break;
-    case "loaded":
-      variantClass = "bg-indigo-100 text-indigo-800 border-indigo-200";
-      break;
-    case "delivered":
-      variantClass = "bg-green-100 text-green-800 border-green-200";
-      break;
-    case "rejected":
-      variantClass = "bg-red-100 text-red-800 border-red-200";
+      variantClass = "bg-[#2563EB] text-white border-transparent";
       break;
     case "on_hold":
-      variantClass = "bg-orange-100 text-orange-800 border-orange-200";
+      variantClass = "bg-[#EA580C] text-white border-transparent";
+      break;
+    case "tax_invoice_pending":
+      variantClass = "bg-[#6D28D9] text-white border-transparent";
+      break;
+    case "ready_for_dispatch":
+      variantClass = "bg-[#0891B2] text-white border-transparent";
+      break;
+    case "loaded":
+      variantClass = "bg-[#0D9488] text-white border-transparent";
+      break;
+    case "delivered":
+      variantClass = "bg-[#059669] text-white border-transparent";
+      break;
+    case "rejected":
+      variantClass = "bg-[#DC2626] text-white border-transparent";
       break;
     default:
       variantClass = "border-transparent bg-[#1E3A5F] text-white hover:bg-[#1E3A5F]/80";

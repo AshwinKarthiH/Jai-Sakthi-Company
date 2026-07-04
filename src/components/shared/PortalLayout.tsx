@@ -4,6 +4,14 @@ import { useStore } from '../../store/StoreContext';
 import { LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '../ui/Button';
 
+const ROLE_ACCENT: Record<string, { bg: string; text: string; label: string }> = {
+  manager: { bg: 'bg-[#7C3AED]', text: 'text-white', label: 'Super Admin' },
+  sales: { bg: 'bg-[#2563EB]', text: 'text-white', label: 'Sales' },
+  production: { bg: 'bg-[#059669]', text: 'text-white', label: 'Production' },
+  inventory: { bg: 'bg-[#D97706]', text: 'text-white', label: 'Inventory' },
+  dispatch: { bg: 'bg-[#0891B2]', text: 'text-white', label: 'Dispatch' },
+};
+
 export function PortalLayout({ children, expectedRole, title }: { children: React.ReactNode, expectedRole: string, title: string }) {
   const { user, logout } = useStore();
   const navigate = useNavigate();
@@ -16,6 +24,8 @@ export function PortalLayout({ children, expectedRole, title }: { children: Reac
 
   if (!user || user.role !== expectedRole) return null;
 
+  const accent = ROLE_ACCENT[user.role] || ROLE_ACCENT.sales;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <header className="bg-[#1E3A5F] text-white border-b border-[#BFDBFE]">
@@ -23,6 +33,9 @@ export function PortalLayout({ children, expectedRole, title }: { children: Reac
           <div className="flex items-center space-x-3">
             <LayoutDashboard className="h-6 w-6 text-white" />
             <h1 className="text-xl font-bold tracking-tight text-white">{title}</h1>
+            <span className={`${accent.bg} ${accent.text} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider`}>
+              {accent.label}
+            </span>
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-sm font-medium text-white/80">User: <span className="text-white capitalize">{user.username}</span></div>

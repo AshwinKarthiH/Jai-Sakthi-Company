@@ -54,7 +54,7 @@ function LoginComponent() {
         <Card className="w-full max-w-md border-border-custom bg-surface-card shadow-md rounded-2xl">
           <CardHeader className="space-y-2 text-center pb-6">
             <div className="text-3xl font-bold tracking-tight text-[#1E3A5F] font-sans">
-              JaiSakthi
+              JaiSakthi Packaging
             </div>
             <CardTitle className="text-sm font-semibold text-text-muted uppercase tracking-wider">
               Enterprise Operations Portal

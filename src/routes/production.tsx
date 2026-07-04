@@ -1,31 +1,30 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useStore } from '../store/StoreContext';
-import type { Order } from '../store/StoreContext';
+import type { Order, OrderLine, DeliveryBatch, DrawingRefFile } from '../store/StoreContext';
 import { PortalLayout } from '../components/shared/PortalLayout';
-import { PurchaseOrderModal } from '../components/shared/PurchaseOrderModal';
+import { openFileInPopup, downloadFile } from '../utils/fileUtils';
 import { Card, CardContent } from '../components/ui/Card';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../components/ui/Table';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Label } from '../components/ui/Label';
 import { Dialog } from '../components/ui/Dialog';
 import { Countdown } from '../components/shared/Countdown';
 import { toast } from 'sonner';
-import { Inbox, Hammer, CheckCircle2, Factory, Trash, Plus, Eye } from 'lucide-react';
+import { Inbox, Hammer, CheckCircle2, Factory, Trash, Plus, Download } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 
 export const Route = createFileRoute('/production')({
   component: ProductionPortalComponent,
 });
 
+type BatchContext = { order: Order; line: OrderLine; batch: DeliveryBatch };
+
 function ProductionPortalComponent() {
   const { orders, inventory, messages, acceptOrder, rejectOrder, completeOrder } = useStore();
 
-  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
-
-  const [acceptingOrder, setAcceptingOrder] = useState<Order | null>(null);
-  const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null);
+  const [acceptingBatch, setAcceptingBatch] = useState<BatchContext | null>(null);
+  const [rejectingBatch, setRejectingBatch] = useState<BatchContext | null>(null);
 
   const [duration, setDuration] = useState('30');
   const [rejectReason, setRejectReason] = useState('');
@@ -33,8 +32,22 @@ function ProductionPortalComponent() {
   const [requiredMaterials, setRequiredMaterials] = useState<{ materialId: string; quantity: number }[]>([]);
 
   const productionMessages = messages.filter((m) => m.to === 'production');
-  const pendingOrders = orders.filter((o) => o.status === 'pending');
-  const inProgressOrders = orders.filter((o) => o.status === 'in_progress');
+  
+  const pendingBatches = orders.flatMap(o => 
+    o.lines.flatMap(l => 
+      (l.deliveryBatches || [])
+        .filter(b => b.status === 'pending')
+        .map(b => ({ batch: b, line: l, order: o }))
+    )
+  );
+
+  const inProgressBatches = orders.flatMap(o => 
+    o.lines.flatMap(l => 
+      (l.deliveryBatches || [])
+        .filter(b => b.status === 'in_progress')
+        .map(b => ({ batch: b, line: l, order: o }))
+    )
+  );
 
   const addMaterialReq = () => setRequiredMaterials([...requiredMaterials, { materialId: '', quantity: 0 }]);
   const updateMaterialReq = (index: number, field: 'materialId' | 'quantity', value: string | number) => {
@@ -45,7 +58,7 @@ function ProductionPortalComponent() {
   const removeMaterialReq = (index: number) => setRequiredMaterials(requiredMaterials.filter((_, i) => i !== index));
 
   const handleAccept = () => {
-    if (!acceptingOrder) return;
+    if (!acceptingBatch) return;
     const durNum = parseInt(duration, 10);
     if (isNaN(durNum) || durNum <= 0) {
       toast.error('Please enter a valid duration in minutes.');
@@ -53,22 +66,22 @@ function ProductionPortalComponent() {
     }
     const validMaterials = requiredMaterials.filter((m) => m.materialId && m.quantity > 0);
     try {
-      acceptOrder(acceptingOrder.id, durNum, validMaterials);
-      toast.success(`Started production for ${acceptingOrder.poNumber}.`);
-      setAcceptingOrder(null);
+      acceptOrder(acceptingBatch.order.id, acceptingBatch.line.lineNo, acceptingBatch.batch.batchId, durNum, validMaterials);
+      toast.success(`Started production for ${acceptingBatch.order.poNumber} (Batch ${acceptingBatch.batch.batchNumber}).`);
+      setAcceptingBatch(null);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to accept order.');
+      toast.error(err.message || 'Failed to accept batch.');
     }
   };
 
   const handleReject = () => {
-    if (!rejectingOrder || !rejectReason.trim()) {
+    if (!rejectingBatch || !rejectReason.trim()) {
       toast.error('Please provide a reason for rejection.');
       return;
     }
-    rejectOrder(rejectingOrder.id, rejectReason.trim());
-    toast.success(`Rejected order ${rejectingOrder.poNumber}.`);
-    setRejectingOrder(null);
+    rejectOrder(rejectingBatch.order.id, rejectingBatch.line.lineNo, rejectingBatch.batch.batchId, rejectReason.trim());
+    toast.success(`Rejected batch ${rejectingBatch.batch.batchNumber} of ${rejectingBatch.order.poNumber}.`);
+    setRejectingBatch(null);
   };
 
   const formatTimestamp = (timestamp: number) => {
@@ -84,120 +97,163 @@ function ProductionPortalComponent() {
     }
   };
 
+  // Renders a file attachment chip — clicking opens popup window, with download button
+  const renderFileChip = (file?: DrawingRefFile) => {
+    if (!file) return null;
+    return (
+      <div className="flex items-center gap-1.5 mt-1">
+        <div
+          className="inline-flex items-center gap-1.5 cursor-pointer bg-slate-100 px-2 py-1 rounded border border-slate-200 hover:bg-slate-200 transition-colors"
+          onClick={() => openFileInPopup(file)}
+          title={`Click to view: ${file.name}`}
+        >
+          {file.type.startsWith('image/') ? (
+            <img src={file.dataUrl} alt="ref" className="h-12 w-12 object-cover rounded-sm" />
+          ) : (
+            <span className="text-sm">📄</span>
+          )}
+          <span className="text-[9px] text-slate-600 max-w-[80px] truncate">{file.name}</span>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); downloadFile(file); }}
+          className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 hover:bg-slate-100 transition-colors"
+          title="Download"
+        >
+          <Download className="h-3 w-3 text-slate-500" />
+        </button>
+      </div>
+    );
+  };
+
+  // Work Card Component (Batch Scoped)
+  const WorkCard = ({ order: o, line: l, batch: b, actions }: { order: Order; line: OrderLine; batch: DeliveryBatch; actions: React.ReactNode }) => (
+    <Card className="border-border-custom bg-white shadow-sm overflow-hidden mb-4">
+      <CardContent className="p-0">
+        {/* Card Header */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#EFF6FF] border-b border-[#BFDBFE]">
+          <div className="flex items-center space-x-2">
+            <span className="font-mono text-sm font-bold text-[#1E3A5F]">{o.poNumber}</span>
+            <Badge variant="outline" className="text-[10px] bg-white border-[#BFDBFE] text-[#1E3A5F]">Batch {b.batchNumber}</Badge>
+          </div>
+          <div className="flex items-center space-x-2">
+            {actions}
+          </div>
+        </div>
+
+        {/* Lines Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-[#DBEAFE] border-b border-[#BFDBFE]">
+                <th className="px-3 py-2 text-left font-semibold text-[#1E3A5F] text-[10px] uppercase">Part No</th>
+                <th className="px-3 py-2 text-left font-semibold text-[#1E3A5F] text-[10px] uppercase">Production Description</th>
+                <th className="px-3 py-2 text-left font-semibold text-[#1E3A5F] text-[10px] uppercase">Drawing Rev</th>
+                <th className="px-3 py-2 text-center font-semibold text-[#1E3A5F] text-[10px] uppercase w-16">Qty</th>
+                <th className="px-3 py-2 text-center font-semibold text-[#1E3A5F] text-[10px] uppercase w-24">Scheduled</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-slate-100 hover:bg-slate-50">
+                <td className="px-3 py-2 font-mono text-xs font-semibold text-[#1E3A5F]">{l.partNumber}</td>
+                <td className="px-3 py-2 text-xs text-[#1E293B]">{l.description}</td>
+                <td className="px-3 py-2">
+                  <div className="text-xs text-[#64748B] italic">{l.drawingRev}</div>
+                  {renderFileChip(l.drawingRefFile)}
+                </td>
+                <td className="px-3 py-2 text-center font-mono font-bold text-xs">{b.quantity}</td>
+                <td className="px-3 py-2 text-center text-xs">{new Date(b.scheduledDate).toLocaleDateString()}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <PortalLayout expectedRole="production" title="JaiSakthi — Production Portal">
+    <PortalLayout expectedRole="production" title="JaiSakthi Packaging — Production Portal">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Left Col: Queue & Active */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Active Production */}
-          <div className="space-y-6">
+          {/* In Progress Section */}
+          <div className="space-y-4">
             <div>
               <h2 className="text-xl font-bold tracking-tight text-[#1E3A5F] flex items-center space-x-2">
-                <Factory className="h-5 w-5 text-primary-custom" /><span>Active Production</span>
+                <Factory className="h-5 w-5 text-primary-custom" /><span>In Progress</span>
               </h2>
               <p className="text-sm text-text-muted">Currently manufacturing</p>
             </div>
-            <Card className="border-[#059669]/30 bg-surface-card shadow-sm overflow-hidden">
-              <CardContent className="p-0">
-                {inProgressOrders.length === 0 ? (
-                  <div className="p-12 text-center flex flex-col items-center justify-center space-y-3 bg-white">
-                    <CheckCircle2 className="h-10 w-10 text-text-muted/30" />
-                    <div className="text-text-primary/70 font-medium text-sm">No active orders</div>
-                    <div className="text-text-muted text-xs">Accept an order from the queue to start.</div>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>PO No</TableHead>
-                        <TableHead>Lines</TableHead>
-                        <TableHead className="text-right">Countdown</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {inProgressOrders.map((o: any) => (
-                        <TableRow key={o.id} className="hover:bg-table-row-hover">
-                          <TableCell className="font-mono text-xs font-semibold text-[#1E3A5F]">{o.poNumber}</TableCell>
-                          <TableCell className="text-xs text-text-muted">{o.lines.length} lines</TableCell>
-                          <TableCell className="text-right"><Countdown eta={o.eta} status={o.status} /></TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end space-x-2">
-                              <Button variant="outline" size="sm" onClick={() => setViewingOrder(o)}
-                                className="h-8 w-8 p-0 rounded-lg border-[#1D4ED8] text-[#1D4ED8]">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="primary" size="sm" onClick={() => completeOrder(o.id)}
-                                className="bg-[#059669] hover:bg-[#047857] border-transparent text-white rounded-lg px-4 font-semibold text-xs shadow-sm">
-                                Complete
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
+            {inProgressBatches.length === 0 ? (
+              <Card className="border-[#059669]/30 bg-surface-card shadow-sm">
+                <CardContent className="p-12 text-center flex flex-col items-center justify-center space-y-3 bg-white">
+                  <CheckCircle2 className="h-10 w-10 text-text-muted/30" />
+                  <div className="text-text-primary/70 font-medium text-sm">No batches in production.</div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {inProgressBatches.map((ctx) => (
+                  <WorkCard
+                    key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`}
+                    order={ctx.order}
+                    line={ctx.line}
+                    batch={ctx.batch}
+                    actions={
+                      <>
+                        <div className="font-mono text-xs tabular-nums text-[#1E3A5F]">
+                          <Countdown eta={ctx.batch.eta} status={ctx.batch.status} />
+                        </div>
+                        <Button variant="primary" size="sm" onClick={() => { completeOrder(ctx.order.id, ctx.line.lineNo, ctx.batch.batchId); toast.success(`${ctx.order.poNumber} Batch ${ctx.batch.batchNumber} marked complete.`); }}
+                          className="bg-[#059669] hover:bg-[#047857] border-transparent text-white rounded-lg px-3 font-semibold text-xs shadow-sm">
+                          Mark Complete
+                        </Button>
+                      </>
+                    }
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Production Queue */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <h2 className="text-xl font-bold tracking-tight text-[#1E3A5F] flex items-center space-x-2">
                 <Hammer className="h-5 w-5 text-primary-custom" /><span>Production Queue</span>
               </h2>
-              <p className="text-sm text-text-muted">Approved orders ready for manufacturing</p>
+              <p className="text-sm text-text-muted">Approved batches ready for manufacturing</p>
             </div>
-            <Card className="border-border-custom bg-surface-card shadow-sm overflow-hidden">
-              <CardContent className="p-0">
-                {pendingOrders.length === 0 ? (
-                  <div className="p-12 text-center flex flex-col items-center justify-center space-y-3 bg-white">
-                    <Hammer className="h-10 w-10 text-text-muted/30" />
-                    <div className="text-text-primary/70 font-medium text-sm">Queue is empty</div>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>PO No</TableHead>
-                        <TableHead>Lines</TableHead>
-                        <TableHead>Buyer</TableHead>
-                        <TableHead>Req. Date</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pendingOrders.map((o: any) => (
-                        <TableRow key={o.id} className="hover:bg-table-row-hover">
-                          <TableCell className="font-mono text-xs font-semibold text-[#1E3A5F]">{o.poNumber}</TableCell>
-                          <TableCell className="text-xs text-text-muted">{o.lines.length} lines</TableCell>
-                          <TableCell className="text-xs">{o.buyer}</TableCell>
-                          <TableCell className="text-xs font-mono">{o.lines[0]?.requestedDate || '—'}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end space-x-2">
-                              <Button variant="outline" size="sm" onClick={() => setViewingOrder(o)}
-                                className="h-7 w-7 p-0 rounded-lg border-[#1D4ED8] text-[#1D4ED8]">
-                                <Eye className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button variant="primary" size="sm" onClick={() => { setAcceptingOrder(o); setDuration('30'); setRequiredMaterials([]); }}
-                                className="bg-[#059669] hover:bg-[#047857] border-transparent text-white rounded-lg px-3 py-1 font-semibold text-xs shadow-sm">
-                                Accept
-                              </Button>
-                              <Button variant="outline" size="sm" onClick={() => { setRejectingOrder(o); setRejectReason(''); }}
-                                className="border-[#DC2626] text-[#DC2626] hover:bg-red-50 rounded-lg px-3 py-1 font-semibold text-xs bg-white">
-                                Reject
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
+            {pendingBatches.length === 0 ? (
+              <Card className="border-border-custom bg-surface-card shadow-sm">
+                <CardContent className="p-12 text-center flex flex-col items-center justify-center space-y-3 bg-white">
+                  <Hammer className="h-10 w-10 text-text-muted/30" />
+                  <div className="text-text-primary/70 font-medium text-sm">No batches in queue.</div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {pendingBatches.map((ctx) => (
+                  <WorkCard
+                    key={`${ctx.order.id}-${ctx.line.lineNo}-${ctx.batch.batchId}`}
+                    order={ctx.order}
+                    line={ctx.line}
+                    batch={ctx.batch}
+                    actions={
+                      <>
+                        <Button variant="primary" size="sm" onClick={() => { setAcceptingBatch(ctx); setDuration('30'); setRequiredMaterials([]); }}
+                          className="bg-[#059669] hover:bg-[#047857] border-transparent text-white rounded-lg px-3 py-1 font-semibold text-xs shadow-sm">
+                          Accept
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => { setRejectingBatch(ctx); setRejectReason(''); }}
+                          className="border-[#DC2626] text-[#DC2626] hover:bg-red-50 rounded-lg px-3 py-1 font-semibold text-xs bg-white">
+                          Reject
+                        </Button>
+                      </>
+                    }
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -232,22 +288,20 @@ function ProductionPortalComponent() {
         </div>
       </div>
 
-      {/* PO Viewer (Restricted Mode for Production) */}
-      <PurchaseOrderModal order={viewingOrder} viewMode="restricted" isOpen={viewingOrder !== null} onClose={() => setViewingOrder(null)} />
-
-      {/* Accept Order Dialog */}
-      <Dialog isOpen={acceptingOrder !== null} onClose={() => setAcceptingOrder(null)} title="Accept Order for Production">
-        {acceptingOrder && (
+      {/* Accept Batch Dialog */}
+      <Dialog isOpen={acceptingBatch !== null} onClose={() => setAcceptingBatch(null)} title="Accept Batch">
+        {acceptingBatch && (
           <div className="space-y-6">
             <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-3 space-y-2">
-              <div className="text-xs font-semibold text-[#1E3A5F]">PO Summary: {acceptingOrder.poNumber}</div>
+              <div className="text-xs font-semibold text-[#1E3A5F]">Work Order: {acceptingBatch.order.poNumber} — Batch {acceptingBatch.batch.batchNumber}</div>
               <ul className="text-xs space-y-1 text-[#1E293B]">
-                {acceptingOrder.lines.map((l, i) => (
-                  <li key={i} className="flex justify-between">
-                    <span><span className="font-mono">{l.partNumber}</span> - {l.description}</span>
-                    <span className="font-mono font-semibold">{l.qty} {l.uom}</span>
-                  </li>
-                ))}
+                <li className="flex flex-col space-y-1 py-1">
+                  <div className="flex justify-between">
+                    <span><span className="font-mono font-semibold">{acceptingBatch.line.partNumber}</span> — {acceptingBatch.line.description}</span>
+                    <span className="font-mono font-semibold">Qty: {acceptingBatch.batch.quantity}</span>
+                  </div>
+                  <div className="text-[10px] text-[#64748B] italic">{acceptingBatch.line.drawingRev}</div>
+                </li>
               </ul>
             </div>
 
@@ -264,7 +318,7 @@ function ProductionPortalComponent() {
                   <Plus className="h-3 w-3" /><span>Add Material</span>
                 </Button>
               </div>
-              
+
               {requiredMaterials.length > 0 && (
                 <div className="space-y-2 border border-border-custom/50 rounded-lg p-3 bg-white">
                   {requiredMaterials.map((req, idx) => (
@@ -288,7 +342,7 @@ function ProductionPortalComponent() {
             </div>
 
             <div className="flex justify-end space-x-3 pt-4 border-t border-border-custom/40">
-              <Button variant="secondary" onClick={() => setAcceptingOrder(null)} className="rounded-lg">Cancel</Button>
+              <Button variant="secondary" onClick={() => setAcceptingBatch(null)} className="rounded-lg">Cancel</Button>
               <Button variant="primary" onClick={handleAccept} className="rounded-lg bg-[#059669] hover:bg-[#047857] text-white border-transparent">
                 Confirm Accept
               </Button>
@@ -297,11 +351,11 @@ function ProductionPortalComponent() {
         )}
       </Dialog>
 
-      {/* Reject Order Dialog */}
-      <Dialog isOpen={rejectingOrder !== null} onClose={() => setRejectingOrder(null)} title="Reject Order">
+      {/* Reject Batch Dialog */}
+      <Dialog isOpen={rejectingBatch !== null} onClose={() => setRejectingBatch(null)} title="Reject Batch">
         <div className="space-y-4">
           <p className="text-sm text-text-primary">
-            Are you sure you want to reject PO <span className="font-semibold font-mono text-[#1E3A5F]">{rejectingOrder?.poNumber}</span>?
+            Are you sure you want to reject Batch {rejectingBatch?.batch.batchNumber} of PO <span className="font-semibold font-mono text-[#1E3A5F]">{rejectingBatch?.order.poNumber}</span>?
           </p>
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-[#1E3A5F]">Reason for Rejection *</Label>
@@ -309,7 +363,7 @@ function ProductionPortalComponent() {
               className="w-full h-24 rounded-lg border border-border-custom bg-white px-3 py-2 text-sm focus:outline-none focus:border-primary-custom resize-none" />
           </div>
           <div className="flex justify-end space-x-3 pt-4">
-            <Button variant="secondary" onClick={() => setRejectingOrder(null)} className="rounded-lg">Cancel</Button>
+            <Button variant="secondary" onClick={() => setRejectingBatch(null)} className="rounded-lg">Cancel</Button>
             <Button variant="primary" onClick={handleReject} className="rounded-lg bg-[#DC2626] hover:bg-red-700 text-white border-transparent">
               Confirm Reject
             </Button>
